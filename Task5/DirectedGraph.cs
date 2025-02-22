@@ -24,8 +24,8 @@ public class DirectedGraph<T>
     {
         var outgoingEdges = _edges.ToLookup(x => x.From);
         var incomingEdges = _edges.ToLookup(x => x.To);
-        var sourceLookup = _vertices.GroupBy(x=>x).ToDictionary(x => x.Key, x => outgoingEdges[x.Key].ToHashSet());
-        var destinationLookup = _vertices.GroupBy(x=>x).ToDictionary(x => x.Key, x => incomingEdges[x.Key].ToHashSet());
+        var sourceLookup = _vertices.ToDictionary(x => x, x => outgoingEdges[x].ToHashSet());
+        var destinationLookup = _vertices.ToDictionary(x => x, x => incomingEdges[x].ToHashSet());
         
         var sources = destinationLookup.Where(x => x.Value.Count == 0).Select(x=>x.Key);
         PriorityQueue<Vertex, T> unvisited = new(sources.Select(x=> (x, x.Value)) );

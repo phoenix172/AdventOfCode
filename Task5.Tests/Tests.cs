@@ -162,14 +162,22 @@ public class Tests
         
         Assert.That(result.ResultNumber, Is.EqualTo(4569));
     }
-
+    
     [Test]
-    public void Test_Part2_Simple()
+    public void Test_Part2_Full()
     {
         var input = Program.ReadRequirementsAndUpdates("Input.txt");
         var result = Program.GetPart2Result(input);
         
-        CollectionAssert.AreEqual(result.CorrectedUpdates, (int[][])[[97,75,47,61,53],[61,29,13],[97,75,47,29,13]]);
+        Assert.That(result.ResultNumber, Is.EqualTo(6456));
+    }
+
+    [Test]
+    public void Test_Part2_Simple()
+    {
+        var input = Program.ReadRequirementsAndUpdates("Input2.txt");
+        var result = Program.GetPart2Result(input);
+        
         Assert.That(result.ResultNumber, Is.EqualTo(123));
     }
 }

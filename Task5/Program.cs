@@ -15,12 +15,14 @@ internal class Program
         var input = ReadRequirementsAndUpdates("Input.txt");
 
         var part1Result = GetPart1Result(input);
-        part1Result.ValidUpdates.ToList()
-            .ForEach(x => Console.WriteLine(string.Join(", ", x)));
+        Console.WriteLine(part1Result.ResultNumber);
+        // part1Result.ValidUpdates.ToList()
+        //     .ForEach(x => Console.WriteLine(string.Join(", ", x)));
         
         var part2Result = GetPart2Result(input);
-        part2Result.CorrectedUpdates.ToList()
-            .ForEach(x => Console.WriteLine(string.Join(", ", x)));
+        Console.WriteLine(part2Result.ResultNumber);
+        // part2Result.CorrectedUpdates.ToList()
+        //     .ForEach(x => Console.WriteLine(string.Join(", ", x)));
     }
 
     public static (int ResultNumber, IReadOnlyList<IReadOnlyList<int>> ValidUpdates) GetPart1Result(Input input)
@@ -39,7 +41,7 @@ internal class Program
             .Where(x => !x.Initial.SequenceEqual(x.Corrected)).Select(x=>x.Corrected).ToList();
         var resultNumber = correctedUpdates.Sum(update => update.Skip(update.Count() / 2).First());
         
-        correctedUpdates.ForEach(x => Console.WriteLine(string.Join(", ", x)));
+        // correctedUpdates.ForEach(x => Console.WriteLine(string.Join(", ", x)));
         
         return (resultNumber, correctedUpdates);
     }
