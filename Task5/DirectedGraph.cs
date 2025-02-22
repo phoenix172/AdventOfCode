@@ -49,7 +49,7 @@ public class DirectedGraph<T>
         }
     }
     
-    public record Vertex(T Value);
+    private record Vertex(T Value);
 
-    public record Edge(Vertex From, Vertex To);
+    private record Edge(Vertex From, Vertex To);
 }
