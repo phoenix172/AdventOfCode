@@ -33,14 +33,19 @@ public class DirectedGraph<T>
         {
             var unvisitedVertex = unvisited.Dequeue();
             yield return unvisitedVertex.Value;
-            foreach (var outgoingEdge in sourceLookup[unvisitedVertex])
+            
+            var edgesToRemove = new List<Edge>();
+            
+            foreach (Edge outgoingEdge in sourceLookup[unvisitedVertex])
             {
                 var enteringEdges = destinationLookup[outgoingEdge.To];
                 enteringEdges.Remove(outgoingEdge);
+                edgesToRemove.Add(outgoingEdge);
                 if (enteringEdges.Count == 0)
                     unvisited.Enqueue(outgoingEdge.To, outgoingEdge.To.Value);
-                sourceLookup[unvisitedVertex].Remove(outgoingEdge);
             }
+
+            edgesToRemove.ForEach(edge => sourceLookup[unvisitedVertex].Remove(edge));
         }
 
         if (sourceLookup.Any(x => x.Value.Count > 0) && unvisited.Count == 0)
