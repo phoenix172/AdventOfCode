@@ -1,14 +1,30 @@
 ﻿namespace Task6;
 
-public record Position(int Row, int Column)
+public readonly struct Position : IEquatable<Position>
 {
-    public Position Move(Direction direction) => new(Row + direction.YOffset, Column + direction.XOffset);
-    
-    public bool IsSameRowOrColumnsAs(Position other)
+    public int Row { get; }
+    public int Column { get; }
+
+    public Position(int row, int column)
     {
-        bool rowEqual = Row == other.Row;
-        bool columnEqual = Column == other.Column;
-        if (rowEqual && columnEqual) return false;
-        return rowEqual || columnEqual;
+        Row = row;
+        Column = column;
+    }
+
+    public Position Move(Direction direction) => new(Row + direction.YOffset, Column + direction.XOffset);
+
+    public bool Equals(Position other)
+    {
+        return Row == other.Row && Column == other.Column;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Position other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Row, Column);
     }
 };

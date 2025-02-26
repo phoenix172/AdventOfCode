@@ -22,10 +22,10 @@ public class Part2Solution
     
     public HashSet<Position> FindLoopPositions(Board<char> board, Guard guard)
     {
-        var loopPositions = new HashSet<Position>();
-
-        var emptyPositions = guard.GetPath().Except([guard.Position]);
-
+        var path = guard.GetPath();
+        var emptyPositions = path.Except([guard.Position]);
+        
+        var loopPositions = new HashSet<Position>(path.Count*2);
         foreach (var pos in emptyPositions)
         {
             board.Set(pos, '#'); 

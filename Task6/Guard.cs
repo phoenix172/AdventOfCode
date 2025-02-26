@@ -39,11 +39,11 @@ public class Guard
             throw new InvalidOperationException("Tried to move through a wall");
         
         if (nextCharacter == default)
-            return new(false, nextCharacter, nextPosition);
+            return new(false, nextCharacter);
 
         Position = nextPosition;
         var lookaheadPosition = Position.Move(Direction);
-        return new(true, Board.Get(lookaheadPosition), lookaheadPosition);
+        return new(true, Board.Get(lookaheadPosition));
     }
 
     public void TurnRight() => Direction = Direction.Next();
@@ -67,7 +67,7 @@ public class Guard
         return visited;
     }
 
-    public record MoveResult(bool Success, char? NextCharacter, Position NextPosition);
+    public record struct MoveResult(bool Success, char? NextCharacter);
 
     public override string ToString() => GuardCharacters[Direction].ToString();
 }
