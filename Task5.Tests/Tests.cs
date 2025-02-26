@@ -2,6 +2,7 @@
 using System.Collections;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Newtonsoft.Json;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Legacy;
 
@@ -175,6 +176,29 @@ public class Tests
     [Test]
     public void Test_Part2_Simple()
     {
+        var input = Program.ReadRequirementsAndUpdates("Input2.txt");
+        var result = Program.GetPart2Result(input);
+        
+        Assert.That(result.ResultNumber, Is.EqualTo(123));
+    }
+    
+    [Test]
+    public void Test()
+    {
+        var rootObject = new
+        {
+            books = new[] {new
+            {
+                id= 20,
+                title=string.Empty,
+                author=string.Empty,
+                publishedYear=0,
+                genre=string.Empty,
+                isAvailable=false
+            }}
+        };
+        var deserialized = JsonConvert.DeserializeAnonymousType(File.ReadAllText(@"C:\Users\Phoenix\Downloads\bookStore.txt"), rootObject);
+        
         var input = Program.ReadRequirementsAndUpdates("Input2.txt");
         var result = Program.GetPart2Result(input);
         
