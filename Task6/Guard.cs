@@ -1,36 +1,4 @@
-﻿using System.Collections.Immutable;
-
-namespace Task6;
-
-public record Position(int Row, int Column)
-{
-    public Position Move(Direction direction) => new(Row + direction.YOffset, Column + direction.XOffset);
-    
-    public bool IsSameRowOrColumnsAs(Position other)
-    {
-        bool rowEqual = Row == other.Row;
-        bool columnEqual = Column == other.Column;
-        if (rowEqual && columnEqual) return false;
-        return rowEqual || columnEqual;
-    }
-};
-
-public record Direction(int YOffset, int XOffset, string Label)
-{
-    public static readonly Direction Up = new(-1, 0, nameof(Up));
-    public static readonly Direction Right = new(0, 1, nameof(Right));
-    public static readonly Direction Down = new(1, 0, nameof(Down));
-    public static readonly Direction Left = new(0, -1, nameof(Left));
-
-    public static ImmutableArray<Direction> All { get; } = [Up, Right, Down, Left];
-
-    public Direction Next()
-    {
-        var index = All.IndexOf(this);
-        index = (index + 1) % All.Length;
-        return All[index];
-    }
-};
+﻿namespace Task6;
 
 public class Guard
 {
@@ -79,35 +47,27 @@ public class Guard
     }
 
     public void TurnRight() => Direction = Direction.Next();
+    
+    
+    public HashSet<Position> GetPath()
+    {
+        var initialPosition = Position;
+        var initialDirection = Direction;
+        Guard.MoveResult moveResult;
+        HashSet<Position> visited = new HashSet<Position>([Position]);
+        while ((moveResult = Forward()).Success)
+        {
+            if (moveResult.NextCharacter == WallCharacter)
+                TurnRight();
+            visited.Add(Position);
+        }
+
+        Position = initialPosition;
+        Direction = initialDirection;
+        return visited;
+    }
 
     public record MoveResult(bool Success, char? NextCharacter, Position NextPosition);
 
     public override string ToString() => GuardCharacters[Direction].ToString();
-}
-
-public class Board<T>
-{
-    public ImmutableArray<ImmutableArray<T>> Grid { get; }
-
-    public Board(ImmutableArray<ImmutableArray<T>> grid)
-    {
-        Grid = grid;
-    }
-
-    public Position? Find(T item)
-    {
-        var found = Grid.SelectMany((row, rowIndex) =>
-            row.Select((cellValue, cellIndex) => (Equal: cellValue?.Equals(item) ?? false, Index: cellIndex))
-                .Where(x => x.Equal).Select(x=>new Position(rowIndex, x.Index)));
-        return found.FirstOrDefault();
-    }
-
-    public T? Get(Position position)
-    {
-        if (position.Row < 0 || position.Row >= Grid.Length)
-            return default;
-        if (position.Column < 0 || position.Column >= Grid[position.Row].Length)
-            return default;
-        return Grid[position.Row][position.Column];
-    }
 }

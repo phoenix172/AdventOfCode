@@ -2,7 +2,6 @@
 
 public class Part2Solution
 {
-    private readonly HashSet<Position> _blockingPoints = new HashSet<Position>();
     private readonly Board<char> _board;
 
     public Part2Solution(Board<char> board)
@@ -13,79 +12,57 @@ public class Part2Solution
     public HashSet<Position> Part2()
     {
         Guard initialGuard = new Guard(_board);
-        ExploreJob initialJob = new([], initialGuard);
-        Queue<ExploreJob> pointsToExplore = new([initialJob]);
-
-        while (pointsToExplore.Count > 0)
-        {
-            var job = pointsToExplore.Dequeue();
-            Explore(job);
-        }
+        var blockingPoints =  FindLoopPositions(_board, initialGuard);
         
-        Console.WriteLine(string.Join("\n", _blockingPoints));
-        Console.WriteLine(_blockingPoints.Count);
+        Console.WriteLine(string.Join("\n", blockingPoints));
+        Console.WriteLine(blockingPoints.Count);
 
-        return _blockingPoints;
+        return blockingPoints;
     }
     
-    public HashSet<Position> Part22()
+    public HashSet<Position> FindLoopPositions(Board<char> board, Guard guard)
     {
-        ExploreJob initialJob = new([], new Guard(_board));
-        Explore(initialJob);
+        var loopPositions = new HashSet<Position>();
 
-        // ExploreJob secondJob = new(initialJob.TurningPoints, new Guard(_board));
-        // Explore(secondJob);
-        //
-        // ExploreJob thirdJob = new(secondJob.TurningPoints, new Guard(_board));
-        // Explore(thirdJob);
-        //
-        // ExploreJob thirdJob1 = new(thirdJob.TurningPoints, new Guard(_board));
-        // Explore(thirdJob1);
+        var emptyPositions = guard.GetPath().Except([guard.Position]);
 
-        Console.WriteLine(string.Join("\n", _blockingPoints));
-        Console.WriteLine(_blockingPoints.Count);
-
-        return _blockingPoints;
-    }
-    
-    void Explore(ExploreJob job)
-    {
-        Guard.MoveResult moveResult = new(false, _board.Get(job.Guard.NextPosition), job.Guard.NextPosition);
-        do
+        foreach (var pos in emptyPositions)
         {
-            TryInsertBlock(job);
-
-            if (moveResult.NextCharacter == Guard.WallCharacter)
+            board.Set(pos, '#'); 
+            if (GuardCreatesLoop(board))
             {
-                job.TurningPoints.Add((Position: job.Guard.Position, DirectionBeforeTurn: job.Guard.Direction));
-                job.Guard.TurnRight();
+                loopPositions.Add(pos);
+            }
+            board.Set(pos, ' '); 
+        }
+
+        return loopPositions;
+    }
+
+    private bool GuardCreatesLoop(Board<char> board)
+    {
+        var guard = new Guard(board);
+        var visited = new HashSet<(Position pos, Direction dir)>();
+
+        while (true)
+        {
+            var state = (guard.Position, guard.Direction);
+            if (!visited.Add(state))
+            {
+                return true; 
             }
 
-            TryInsertBlock(job);
-        } while ((moveResult = job.Guard.Forward()).Success);
-    }
-    
-    void TryInsertBlock(ExploreJob job)
-    {
-        var facing = _board.Get(job.Guard.NextPosition);
-        if (facing == Guard.DefaultGuardCharacter)
-            return;
             
-        var points = job.TurningPoints.Where(Predicate).ToList();
-
-        if (points.Any() && facing == Guard.EmptySpaceCharacter)
-            _blockingPoints.Add(job.Guard.NextPosition);
+            while (board.Get(guard.NextPosition) == Guard.WallCharacter)
+            {
+                guard.TurnRight();
+            }
+            var moveResult = guard.Forward();
             
-        bool Predicate((Position Position, Direction DirectionBeforeTurn) turningPoint)
-            => job.Guard.Position.IsSameRowOrColumnsAs(turningPoint.Position) &&
-               job.Guard.Direction.Next() == turningPoint.DirectionBeforeTurn;
-    }
-    
-    private class ExploreJob(
-        List<(Position Position, Direction DirectionBeforeTurn)> turningPoints,
-        Guard guard)
-    {
-        public List<(Position Position, Direction DirectionBeforeTurn)> TurningPoints { get; } = turningPoints;
-        public Guard Guard { get; } = guard;
+            if (!moveResult.Success)
+            {
+                return false; 
+            }
+        }
     }
 }
